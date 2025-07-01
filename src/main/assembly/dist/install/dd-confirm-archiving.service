@@ -1,0 +1,15 @@
+[Unit]
+Description=Dd Confirm Archiving Service
+
+[Service]
+ExecStart=/opt/dans.knaw.nl/dd-confirm-archiving/bin/dd-confirm-archiving server /etc/opt/dans.knaw.nl/dd-confirm-archiving/config.yml
+# Java returns 143 even if the SIGTERM was handled correctly.
+SuccessExitStatus=143
+Environment="JAVA_OPTS=-Xms64m"
+Environment="LC_ALL=en_US.UTF-8"
+
+User=dd-confirm-archiving
+Group=dd-confirm-archiving
+
+[Install]
+WantedBy=multi-user.target
