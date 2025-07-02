@@ -15,6 +15,7 @@
 #
 
 mvn dans-build-resources:get-helper-script
+mvn initialize # To ensure API definition is downloaded
 
 echo "Deploying Swagger UI and API definition..."
 sh target/add-swagger-ui.sh
