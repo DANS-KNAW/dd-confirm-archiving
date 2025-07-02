@@ -93,7 +93,7 @@
             <plugin>
                 <groupId>nl.knaw.dans</groupId>
                 <artifactId>dans-build-resources-maven-plugin</artifactId>
-                <version>0.6.1-SNAPSHOT</version>
+                <version>0.7.0</version>
                 <executions>
                     <execution>
                         <id>set-up-swagger-ui</id>
