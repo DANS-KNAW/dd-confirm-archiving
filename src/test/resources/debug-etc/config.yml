@@ -21,7 +21,7 @@ logging:
     - type: file
       logFormat: "%-5p [%d{ISO8601}] %c{0}: %m%n%dwREx"
       archive: false
-      currentLogFilename: data/dd-data-vault.log
+      currentLogFilename: data/dd-confirm-archiving.log
   loggers:
     'nl.knaw.dans': 'DEBUG'
     'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
