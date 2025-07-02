@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.confirmarch.resources;
 
+import io.dropwizard.hibernate.UnitOfWork;
 import lombok.AllArgsConstructor;
 import nl.knaw.dans.confirmarch.Conversions;
 import nl.knaw.dans.confirmarch.api.ConfirmationRequestDto;
@@ -31,13 +32,13 @@ public class ConfirmationRequestApiResource implements ConfirmationRequestsApi {
     private final ConfirmationRequestDao confirmationRequestDao;
 
     @Override
+    @UnitOfWork
     public Response confirmationRequestsPost(ConfirmationRequestDto confirmationRequestDto) {
         // TODO: check for conflict.
 
         confirmationRequestDao.save(conversions.convert(confirmationRequestDto));
         return Response
             .created(URI.create("/confirmationRequests/" + confirmationRequestDto.getNbn() + "/versions/" + confirmationRequestDto.getVersion()))
-            .entity(confirmationRequestDto)
             .build();
     }
 }

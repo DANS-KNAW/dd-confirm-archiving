@@ -61,5 +61,5 @@ public class ConfirmationRequest {
     private OffsetDateTime archivalTimestamp;
 
     @Column(name = "dve_deleted", nullable = false)
-    private Boolean dveDeleted;
+    private boolean dveDeleted;
 }
