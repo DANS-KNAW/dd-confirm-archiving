@@ -1,0 +1,105 @@
+#
+# Copyright (C) 2025 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+openapi: 3.0.1
+
+servers:
+  - url: http://localhost:20370/
+
+info:
+  description: Service for ...
+  version: 0.1.0
+  title: dd-confirm-archiving-api
+  contact:
+    email: info@dans.knaw.nl
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /:
+    get:
+      summary: Returns a description of the service
+      description:
+        This is the starting place for navigating the Confirm Archiving Service. It returns a description of the service.
+      operationId: getInfo
+      parameters:
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+            enum: [ application/json, text/html ]
+            default: application/json
+      responses:
+        200:
+          description: Description of the service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfo'
+            text/html:
+              schema:
+                type: string
+
+  /confirmationRequests:
+    post:
+      summary: Creates a new confirmation ConfirmationRequest
+      operationId: confirmationRequestsPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationRequest'
+      responses:
+        201:
+          description: request created
+        409:
+          description: request already exists
+
+components:
+  schemas:
+    AppInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+
+    ConfirmationRequest:
+      type: object
+      required:
+        - dvePath
+        - storageRoot
+        - nbn
+        - version
+      properties:
+        dvePath:
+          type: string
+          format: path
+          description: absolute path to the DVE to be confirmed
+        storageRoot:
+          type: string
+          description: shortname for the OCFL Storage Root in which the DVE is expected to be archived
+        nbn:
+          type: string
+        version:
+          type: integer
+
+
+
+
