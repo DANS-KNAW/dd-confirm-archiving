@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+# Fail on error
+set -e
+
 mvn dans-build-resources:get-helper-script
 mvn initialize # To ensure API definition is downloaded
 
