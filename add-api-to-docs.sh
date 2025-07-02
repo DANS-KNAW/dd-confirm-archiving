@@ -14,33 +14,9 @@
 # limitations under the License.
 #
 
-site_name: dd-confirm-archiving
-theme:
-  name: readthedocs
+mvn dans-build-resources:get-helper-script
 
-repo_name: DANS-KNAW/dd-confirm-archiving
-repo_url: https://github.com/DANS-KNAW/dd-confirm-archiving
-
-nav:
-  - Manual:
-      - DESCRIPTION: index.md
-      - INSTALLATION: installation.md
-      - CONFIGURATION: config.md
-      - API: to-api.md
-      - ⇒ Context: context.md
-
-plugins:
-  - markdownextradata
-  - search
-
-markdown_extensions:
-  - attr_list
-  - admonition
-  - codehilite:
-      guess_lang: False
-      use_pygments: False
-  - def_list
-  - footnotes
-  - meta
-  - toc:
-      permalink: True
+echo "Deploying Swagger UI and API definition..."
+sh target/add-swagger-ui.sh
+cp target/openapi/*.yml docs/api.yml
+echo "DONE"

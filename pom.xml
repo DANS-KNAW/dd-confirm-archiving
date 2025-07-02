@@ -91,6 +91,19 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>nl.knaw.dans</groupId>
+                <artifactId>dans-build-resources-maven-plugin</artifactId>
+                <version>0.6.1-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>set-up-swagger-ui</id>
+                        <goals>
+                            <goal>get-helper-script</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
