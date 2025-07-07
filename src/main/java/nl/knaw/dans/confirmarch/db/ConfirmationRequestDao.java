@@ -25,6 +25,20 @@ public class ConfirmationRequestDao extends AbstractDAO<ConfirmationRequest> {
         super(sessionFactory);
     }
 
+   public ConfirmationRequest findByNbnAndVersion(String nbn, int version) {
+       var builder = currentSession().getCriteriaBuilder();
+       var query = builder.createQuery(ConfirmationRequest.class);
+       var root = query.from(ConfirmationRequest.class);
+       query.select(root)
+           .where(
+               builder.and(
+                   builder.equal(root.get("nbn"), nbn),
+                   builder.equal(root.get("version"), version)
+               )
+           );
+       return currentSession().createQuery(query).uniqueResult();
+   }
+
     public ConfirmationRequest save(ConfirmationRequest confirmationRequest) {
         try {
             if (confirmationRequest.getId() == null || get(confirmationRequest.getId()) == null) {
