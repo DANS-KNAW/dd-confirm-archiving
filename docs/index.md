@@ -1,13 +1,18 @@
 dd-confirm-archiving
-====================
+=============
 
-SYNOPSIS
---------
+Registers the Data Vault archived status in the Vault Catalog
 
-    dd-confirm-archiving { server | check }
+Purpose
+-------
+TODO
 
+Interfaces
+----------
 
-DESCRIPTION
------------
+TODO
 
-Registers the Data Vault archived status in the Vault Catalog.
+Processing
+----------
+
+TODO

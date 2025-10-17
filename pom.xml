@@ -131,6 +131,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>compilation-dependencies</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -174,6 +175,7 @@
                             <apiPackage>nl.knaw.dans.confirmarch.resources</apiPackage>
                             <modelPackage>nl.knaw.dans.confirmarch.api</modelPackage>
                             <invokerPackage>nl.knaw.dans.confirmarch.resources</invokerPackage>
+                            <templateDirectory>${project.basedir}/src/main/resources/openapi-generator-templates</templateDirectory>
                         </configuration>
                     </execution>
                     <execution>

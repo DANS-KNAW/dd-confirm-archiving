@@ -1,8 +1,6 @@
----
-
-Context: DANS Data Station Architecture
-=======================================
+Context
+=======
 
 This module is a component in the [DANS Data Station Architecture]{:target=_blank}.
 
-[DANS Data Station Architecture]: https://dans-knaw.github.io/dans-datastation-architecture/datastation/#dd-confirm-archiving
+[DANS Data Station Architecture]: https://dans-knaw.github.io/dans-datastation-architecture/
