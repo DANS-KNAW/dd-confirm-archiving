@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.confirmarch.client;
 
+import io.dropwizard.client.JerseyClientConfiguration;
 import nl.knaw.dans.confirmarch.config.ServiceConfig;
 import nl.knaw.dans.datavault.client.invoker.ApiClient;
 import nl.knaw.dans.datavault.client.invoker.ApiException;
@@ -26,12 +27,12 @@ import java.time.OffsetDateTime;
 public class DataVaultClient {
     private final DefaultApi api;
 
-    public DataVaultClient(ServiceConfig serviceConfig) {
+    public DataVaultClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
         api = new ClientProxyBuilder<ApiClient, DefaultApi>()
             .basePath(serviceConfig.getUrl())
             .apiClient(new ApiClient())
             .defaultApiCtor(DefaultApi::new)
-            .httpClient(serviceConfig.getHttpClient())
+            .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
             .build();
     }
 

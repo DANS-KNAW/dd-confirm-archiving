@@ -46,10 +46,10 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
 
     @Override
     public void run(final DdConfirmArchivingConfig configuration, final Environment environment) {
-        var vaultCatalogClient = new VaultCatalogClient(configuration.getVaultCatalog());
+        var vaultCatalogClient = new VaultCatalogClient(configuration.getVaultCatalog(), configuration.getDefaultHttpClient());
         var storageRoots = new HashMap<String, DataVaultClient>();
         for (var dataVaultConfig : configuration.getStorageRoots()) {
-            storageRoots.put(dataVaultConfig.getOcflStorageRoot(), new DataVaultClient(dataVaultConfig));
+            storageRoots.put(dataVaultConfig.getOcflStorageRoot(), new DataVaultClient(dataVaultConfig, configuration.getDefaultHttpClient()));
         }
         var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, configuration.getConfirmArchiving().getMaxItemsPerRun());
 

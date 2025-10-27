@@ -16,6 +16,7 @@
 
 package nl.knaw.dans.confirmarch.config;
 
+import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.core.Configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,4 +41,6 @@ public class DdConfirmArchivingConfig extends Configuration {
     @Valid
     private ConfirmArchivingConfig confirmArchiving;
 
+    @Valid
+    private JerseyClientConfiguration defaultHttpClient;
 }

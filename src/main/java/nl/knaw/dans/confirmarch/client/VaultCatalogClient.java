@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.confirmarch.client;
 
+import io.dropwizard.client.JerseyClientConfiguration;
 import nl.knaw.dans.confirmarch.config.ServiceConfig;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 import nl.knaw.dans.vaultcatalog.client.api.UnconfirmedDatasetVersionExportDto;
@@ -28,12 +29,12 @@ import java.util.List;
 public class VaultCatalogClient {
     private final DefaultApi api;
 
-    public VaultCatalogClient(ServiceConfig serviceConfig) {
+    public VaultCatalogClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
         api = new ClientProxyBuilder<ApiClient, DefaultApi>()
             .apiClient(new ApiClient())
             .defaultApiCtor(DefaultApi::new)
             .basePath(serviceConfig.getUrl())
-            .httpClient(serviceConfig.getHttpClient())
+            .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
             .build();
     }
 
