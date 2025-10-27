@@ -31,8 +31,28 @@ logging:
       archive: false
       timeZone: system
       currentLogFilename: /var/opt/dans.knaw.nl/log/dd-confirm-archiving/dd-confirm-archiving.log
-    - type:  console
+    - type: console
       # Used in combination with journald, which already adds the timestamp
       logFormat: "%-5p %c{0}: %m%n%dwREx"
   loggers:
-      'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+    'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+
+confirmArchiving:
+  maxItemsPerRun: 100
+  runEvery: 1min
+
+vaultCatalog:
+  url: https://dev.transfer.dans-data.nl
+  httpClient:
+    userAgent: dd-confirm-archiving
+    connectionTimeout: 1min
+    cookiesEnabled: false
+    keepAlive: 0ms
+    maxConnections: 128
+    maxConnectionsPerRoute: 128
+    retries: 0
+    timeToLive: 1h
+    timeout: 30s
+dataVaults: [ ]
+#    - ocflStorageRoot: user001
+#      url: http://localhost/dd-data-vault/user001

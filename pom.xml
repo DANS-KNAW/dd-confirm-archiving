@@ -37,6 +37,8 @@
     <properties>
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
         <dd-confirm-archiving-api.version>0.1.0</dd-confirm-archiving-api.version>
+        <dd-vault-catalog-api.version>0.9.1-SNAPSHOT</dd-vault-catalog-api.version>
+        <dd-data-vault-api.version>0.7.1-SNAPSHOT</dd-data-vault-api.version>
     </properties>
 
     <scm>
@@ -48,18 +50,6 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard</groupId>
-            <artifactId>dropwizard-hibernate</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -102,9 +92,6 @@
             <artifactId>dans-validation-lib</artifactId>
             <version>1.0.0</version>
         </dependency>
-
-
-
     </dependencies>
 
     <build>
@@ -140,12 +127,6 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>nl.knaw.dans</groupId>
-                                    <artifactId>dd-confirm-archiving-api</artifactId>
-                                    <version>${dd-confirm-archiving-api.version}</version>
-                                    <outputDirectory>${project.build.directory}/openapi</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>nl.knaw.dans</groupId>
                                     <artifactId>dd-vault-catalog-api</artifactId>
                                     <version>${dd-vault-catalog-api.version}</version>
                                     <outputDirectory>${project.build.directory}/openapi</outputDirectory>
@@ -165,19 +146,6 @@
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration combine.children="override">
-                            <generatorName>jaxrs-spec</generatorName>
-                            <inputSpec>${project.build.directory}/openapi/dd-confirm-archiving-api.yml</inputSpec>
-                            <apiPackage>nl.knaw.dans.confirmarch.resources</apiPackage>
-                            <modelPackage>nl.knaw.dans.confirmarch.api</modelPackage>
-                            <invokerPackage>nl.knaw.dans.confirmarch.resources</invokerPackage>
-                            <templateDirectory>${project.basedir}/src/main/resources/openapi-generator-templates</templateDirectory>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>vault-catalog-client</id>
                         <goals>

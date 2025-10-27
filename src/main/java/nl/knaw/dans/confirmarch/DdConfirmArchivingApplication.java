@@ -19,13 +19,17 @@ package nl.knaw.dans.confirmarch;
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
+import nl.knaw.dans.confirmarch.client.DataVaultClient;
+import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 import nl.knaw.dans.confirmarch.config.DdConfirmArchivingConfig;
-import nl.knaw.dans.confirmarch.db.ConfirmationRequestDao;
-import nl.knaw.dans.confirmarch.resources.ConfirmationRequestApiResource;
+import nl.knaw.dans.confirmarch.core.ConfirmationTask;
+
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DdConfirmArchivingApplication extends Application<DdConfirmArchivingConfig> {
-    private final DdConfirmArchivingHibernateBundle hibernateBundle = new DdConfirmArchivingHibernateBundle();
-
     public static void main(final String[] args) throws Exception {
         new DdConfirmArchivingApplication().run(args);
     }
@@ -37,13 +41,20 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
 
     @Override
     public void initialize(final Bootstrap<DdConfirmArchivingConfig> bootstrap) {
-        bootstrap.addBundle(hibernateBundle);
+
     }
 
     @Override
     public void run(final DdConfirmArchivingConfig configuration, final Environment environment) {
-        var confirmationRequestDao = new ConfirmationRequestDao(hibernateBundle.getSessionFactory());
-        environment.jersey().register(new ConfirmationRequestApiResource(confirmationRequestDao));
+        var vaultCatalogClient = new VaultCatalogClient(configuration.getVaultCatalog());
+        var storageRoots = new HashMap<String, DataVaultClient>();
+        for (var dataVaultConfig : configuration.getStorageRoots()) {
+            storageRoots.put(dataVaultConfig.getOcflStorageRoot(), new DataVaultClient(dataVaultConfig));
+        }
+        var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, configuration.getConfirmArchiving().getMaxItemsPerRun());
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(confirmationTask, 0, configuration.getConfirmArchiving().getRunEvery().toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
 }

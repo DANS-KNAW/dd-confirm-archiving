@@ -13,31 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.knaw.dans.confirmarch.config;
 
-import io.dropwizard.core.Configuration;
+import io.dropwizard.util.Duration;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class DdConfirmArchivingConfig extends Configuration {
+public class ConfirmArchivingConfig {
+    @Min(1)
+    private int maxItemsPerRun;
 
-    @NotNull
     @Valid
-    private ServiceConfig vaultCatalog;
-
     @NotNull
-    @Valid
-    private List<DataVaultConfig> storageRoots;
-
-    @NotNull
-    @Valid
-    private ConfirmArchivingConfig confirmArchiving;
-
+    private Duration runEvery;
 }

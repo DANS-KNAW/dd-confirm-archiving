@@ -15,8 +15,29 @@
  */
 package nl.knaw.dans.confirmarch.client;
 
-public interface DataVaultClient {
+import nl.knaw.dans.confirmarch.config.ServiceConfig;
+import nl.knaw.dans.datavault.client.invoker.ApiClient;
+import nl.knaw.dans.datavault.client.invoker.ApiException;
+import nl.knaw.dans.datavault.client.resources.DefaultApi;
+import nl.knaw.dans.lib.util.ClientProxyBuilder;
 
-    boolean isArchived(String nbn, int version);
+import java.time.OffsetDateTime;
+
+public class DataVaultClient {
+    private final DefaultApi api;
+
+    public DataVaultClient(ServiceConfig serviceConfig) {
+        api = new ClientProxyBuilder<ApiClient, DefaultApi>()
+            .basePath(serviceConfig.getUrl())
+            .apiClient(new ApiClient())
+            .defaultApiCtor(DefaultApi::new)
+            .httpClient(serviceConfig.getHttpClient())
+            .build();
+    }
+
+    public OffsetDateTime getCreationTime(String nbn, int versionNumber) throws ApiException {
+        var version = api.objectsIdVersionsNrGet(nbn, versionNumber);
+        return version.getCreated();
+    }
 
 }

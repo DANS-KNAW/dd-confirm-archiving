@@ -15,8 +15,33 @@
  */
 package nl.knaw.dans.confirmarch.client;
 
-import java.time.OffsetDateTime;
+import nl.knaw.dans.confirmarch.config.ServiceConfig;
+import nl.knaw.dans.lib.util.ClientProxyBuilder;
+import nl.knaw.dans.vaultcatalog.client.api.UnconfirmedDatasetVersionExportDto;
+import nl.knaw.dans.vaultcatalog.client.invoker.ApiClient;
+import nl.knaw.dans.vaultcatalog.client.invoker.ApiException;
+import nl.knaw.dans.vaultcatalog.client.resources.DefaultApi;
 
-public interface VaultCatalogClient {
-    void setArchived(String nbn, int version, OffsetDateTime archivalTimestamp);
+import java.time.OffsetDateTime;
+import java.util.List;
+
+public class VaultCatalogClient {
+    private final DefaultApi api;
+
+    public VaultCatalogClient(ServiceConfig serviceConfig) {
+        api = new ClientProxyBuilder<ApiClient, DefaultApi>()
+            .apiClient(new ApiClient())
+            .defaultApiCtor(DefaultApi::new)
+            .basePath(serviceConfig.getUrl())
+            .httpClient(serviceConfig.getHttpClient())
+            .build();
+    }
+
+    public List<UnconfirmedDatasetVersionExportDto> getUnconfirmedItems(int maxItemsPerRun) throws ApiException {
+        return api.getUnconfirmedDatasetVersionExports(maxItemsPerRun, 0);
+    }
+
+    public void setArchivedTimestamp(String datasetNbn, Integer ocflObjectVersionNumber, OffsetDateTime creationTime) throws ApiException {
+        api.setVersionExportArchivedTimestamp(datasetNbn, ocflObjectVersionNumber, creationTime);
+    }
 }
