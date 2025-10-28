@@ -19,42 +19,40 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
-import nl.knaw.dans.confirmarch.db.ConfirmationRequestDao;
 
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.time.OffsetDateTime;
+import java.util.Map;
 
 @AllArgsConstructor
 @Slf4j
 public class ConfirmationTask implements Runnable {
-    private final ConfirmationRequestDao confirmationRequestDao;
-    private final String nbn;
-    private final int version;
-    private final DataVaultClient dataVaultClient;
     private final VaultCatalogClient vaultCatalogClient;
+    private final Map<String, DataVaultClient> storageRootClients;
+    private final int maxItemsPerRun;
 
     @Override
     public void run() {
-        var confirmationRequest = confirmationRequestDao.findByNbnAndVersion(nbn, version);
-        if (confirmationRequest == null) {
-            log.error("Confirmation request not found for nbn={}, version={}", nbn, version);
-            return;
-        }
-        if (dataVaultClient.isArchived(nbn, version)) {
-            log.error("Already archived: nbn={}, version={}", nbn, version);
-        }
-        else {
-            log.info("Archiving: nbn={}, version={}", nbn, version);
-            var archivalTimestamp = OffsetDateTime.now();
-            vaultCatalogClient.setArchived(nbn, version, archivalTimestamp);
-            var dve = confirmationRequest.getDvePath();
+        log.info("Starting confirmation task with maxItemsPerRun={}", maxItemsPerRun);
+        try {
+            // Get unconfirmed items from Vault Catalog
+            var unconfirmedItems = vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun);
+            log.debug("Found {} unconfirmed items", unconfirmedItems.size());
 
-            log.info("Archiving completed for nbn={}, version={}", confirmationRequest.getNbn(), confirmationRequest.getVersion());
+            int numberConfirmed = 0;
+            for (var item : unconfirmedItems) {
+                var client = storageRootClients.get(item.getStorageRoot());
+                var creationTime = client.getCreationTime(item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                if (creationTime.isEmpty()) {
+                    log.debug("Item datasetNbn={}, version={} not yet archived", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                    continue;
+                }
+                vaultCatalogClient.setArchivedTimestamp(item.getDatasetNbn(), item.getOcflObjectVersionNumber(), creationTime.get());
+                log.debug("Confirmed datasetNbn={}, version={}", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                numberConfirmed++;
+            }
+            log.info("Confirmation task completed - {} items confirmed", numberConfirmed);
         }
-    }
-
-    private void deleteDve(Path dve) {
+        catch (Exception e) {
+            log.error("Error during confirmation task", e);
+        }
     }
 }

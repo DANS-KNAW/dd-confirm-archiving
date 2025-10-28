@@ -1,10 +1,6 @@
-
 server:
-  applicationContextPath: /
+  applicationConnectors: []
   adminContextPath: /
-  applicationConnectors:
-    - type: http
-      port: 20370
   adminConnectors:
     - type: http
       port: 20371
@@ -26,12 +22,25 @@ logging:
     'nl.knaw.dans': 'DEBUG'
     'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
 
-database:
-  driverClass: org.hsqldb.jdbcDriver
-  url: jdbc:hsqldb:hsql://localhost:9001/dd-confirm-archiving
-  logValidationErrors: true
-  # See: https://stackoverflow.com/questions/10684244/dbcp-validationquery-for-different-databases
-  validationQuery: SELECT * FROM INFORMATION_SCHEMA.SYSTEM_TABLES
-  properties:
-    hibernate.dialect: 'org.hibernate.dialect.HSQLDialect'
-    hibernate.hbm2ddl.auto: update
+confirmArchiving:
+  maxItemsPerRun: 100
+  runEvery: 5s
+
+vaultCatalog:
+  url: http://dev.transfer.dans-data.nl:20305/
+
+storageRoots:
+  - ocflStorageRoot: user001
+    url: http://dev.transfer.dans-data.nl/dd-data-vault/user001
+
+defaultHttpClient:
+  userAgent: dd-confirm-archiving
+  connectionTimeout: 1min
+  cookiesEnabled: false
+  keepAlive: 0ms
+  maxConnections: 128
+  maxConnectionsPerRoute: 128
+  retries: 0
+  timeToLive: 1h
+  timeout: 30s
+

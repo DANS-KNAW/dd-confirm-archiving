@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.confirmarch;
+package nl.knaw.dans.confirmarch.config;
 
-import nl.knaw.dans.confirmarch.api.ConfirmationRequestDto;
-import nl.knaw.dans.confirmarch.core.ConfirmationRequest;
-import org.mapstruct.Mapper;
+import io.dropwizard.client.JerseyClientConfiguration;
+import lombok.Data;
 
-@Mapper
-public interface Conversions {
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
 
-    ConfirmationRequest convert(ConfirmationRequestDto confirmationRequestDto);
+@Data
+public class ServiceConfig {
+    @Valid
+    @NotNull
+    private URI url;
+
+    @Valid
+    private JerseyClientConfiguration httpClient;
 }

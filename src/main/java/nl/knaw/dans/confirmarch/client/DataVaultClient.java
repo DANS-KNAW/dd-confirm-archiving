@@ -15,8 +15,41 @@
  */
 package nl.knaw.dans.confirmarch.client;
 
-public interface DataVaultClient {
+import io.dropwizard.client.JerseyClientConfiguration;
+import nl.knaw.dans.confirmarch.config.ServiceConfig;
+import nl.knaw.dans.datavault.client.invoker.ApiClient;
+import nl.knaw.dans.datavault.client.invoker.ApiException;
+import nl.knaw.dans.datavault.client.resources.DefaultApi;
+import nl.knaw.dans.lib.util.ClientProxyBuilder;
 
-    boolean isArchived(String nbn, int version);
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
+public class DataVaultClient {
+    private final DefaultApi api;
+
+    public DataVaultClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
+        api = new ClientProxyBuilder<ApiClient, DefaultApi>()
+            .basePath(serviceConfig.getUrl())
+            .apiClient(new ApiClient())
+            .defaultApiCtor(DefaultApi::new)
+            .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
+            .build();
+    }
+
+    public Optional<OffsetDateTime> getCreationTime(String nbn, int versionNumber) throws ApiException {
+        try {
+            var version = api.objectsIdVersionsNrGet(nbn, versionNumber);
+            return Optional.ofNullable(version.getCreated());
+        }
+        catch (ApiException e) {
+            if (e.getCode() == 404) {
+                return Optional.empty();
+            }
+            else {
+                throw e;
+            }
+        }
+    }
 
 }

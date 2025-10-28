@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.confirmarch;
+package nl.knaw.dans.confirmarch.config;
 
-import io.dropwizard.db.PooledDataSourceFactory;
-import io.dropwizard.hibernate.HibernateBundle;
-import nl.knaw.dans.confirmarch.config.DdConfirmArchivingConfig;
-import nl.knaw.dans.confirmarch.core.ConfirmationRequest;
+import lombok.Data;
 
-public class DdConfirmArchivingHibernateBundle extends HibernateBundle<DdConfirmArchivingConfig> {
-    protected DdConfirmArchivingHibernateBundle() {
-        super(ConfirmationRequest.class);
-    }
+import javax.validation.constraints.NotNull;
 
-    @Override
-    public PooledDataSourceFactory getDataSourceFactory(DdConfirmArchivingConfig ddConfirmArchivingConfig) {
-        return ddConfirmArchivingConfig.getDatabase();
-    }
+@Data
+public class StorageRootConfig extends ServiceConfig {
+    @NotNull
+    private String ocflStorageRoot;
 }

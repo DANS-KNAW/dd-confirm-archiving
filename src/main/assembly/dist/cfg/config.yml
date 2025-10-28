@@ -1,25 +1,10 @@
-#
-# dd-confirm-archiving configuration file
-#
 server:
-  applicationContextPath: /
+  # Disable application connectors as this service only exposes admin tasks
+  applicationConnectors: [ ]
   adminContextPath: /
-  applicationConnectors:
-    - type: http
-      # Replace with port number unique for this service
-      port: 20000 # TODO: Replace with unique port number
   adminConnectors:
     - type: http
-      # Replace with port number unique for this service
-      port: 20001 # TODO: Replace with unique port number
-  # Logs the requests to the Jetty http server
-  requestLog:
-    appenders:
-      - type: file
-        archive: false
-        timeZone: system
-        currentLogFilename: /var/opt/dans.knaw.nl/log/dd-confirm-archiving/request.log
-
+      port: 20371
 
 #
 # See https://www.dropwizard.io/en/latest/manual/configuration.html#logging
@@ -31,8 +16,35 @@ logging:
       archive: false
       timeZone: system
       currentLogFilename: /var/opt/dans.knaw.nl/log/dd-confirm-archiving/dd-confirm-archiving.log
-    - type:  console
+    - type: console
       # Used in combination with journald, which already adds the timestamp
       logFormat: "%-5p %c{0}: %m%n%dwREx"
   loggers:
-      'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+    'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+
+confirmArchiving:
+  # In each run, process at most this many items that need archiving confirmation
+  maxItemsPerRun: 100
+  # The task will run at this interval
+  runEvery: 1min
+
+vaultCatalog:
+  url: http://change.me
+
+# Storage roots to query for datasets needing archiving confirmation
+storageRoots: [ ]
+#    - ocflStorageRoot: user001
+#      url: http://localhost/dd-data-vault/user001
+
+# The default HTTP client configuration for outgoing requests, can be by vaultCatalog and storage roots
+defaultHttpClient:
+  userAgent: dd-confirm-archiving
+  connectionTimeout: 1min
+  cookiesEnabled: false
+  keepAlive: 0ms
+  maxConnections: 128
+  maxConnectionsPerRoute: 128
+  retries: 0
+  timeToLive: 1h
+  timeout: 30s
+
