@@ -37,8 +37,8 @@
     <properties>
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
         <dd-confirm-archiving-api.version>0.1.0</dd-confirm-archiving-api.version>
-        <dd-vault-catalog-api.version>0.9.1-SNAPSHOT</dd-vault-catalog-api.version>
-        <dd-data-vault-api.version>0.7.1-SNAPSHOT</dd-data-vault-api.version>
+        <dd-vault-catalog-api.version>0.10.0</dd-vault-catalog-api.version>
+        <dd-data-vault-api.version>0.8.0</dd-data-vault-api.version>
     </properties>
 
     <scm>
