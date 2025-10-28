@@ -1,9 +1,6 @@
 server:
-  applicationContextPath: /
+  applicationConnectors: []
   adminContextPath: /
-  applicationConnectors:
-    - type: http
-      port: 20370
   adminConnectors:
     - type: http
       port: 20371
@@ -27,7 +24,7 @@ logging:
 
 confirmArchiving:
   maxItemsPerRun: 100
-  runEvery: 5sec
+  runEvery: 5s
 
 vaultCatalog:
   url: http://dev.transfer.dans-data.nl:20305/
