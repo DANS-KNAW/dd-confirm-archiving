@@ -43,16 +43,19 @@ confirmArchiving:
 
 vaultCatalog:
   url: https://dev.transfer.dans-data.nl
-  httpClient:
-    userAgent: dd-confirm-archiving
-    connectionTimeout: 1min
-    cookiesEnabled: false
-    keepAlive: 0ms
-    maxConnections: 128
-    maxConnectionsPerRoute: 128
-    retries: 0
-    timeToLive: 1h
-    timeout: 30s
-dataVaults: [ ]
+
+storageRoots: [ ]
 #    - ocflStorageRoot: user001
 #      url: http://localhost/dd-data-vault/user001
+
+defaultHttpClient:
+  userAgent: dd-confirm-archiving
+  connectionTimeout: 1min
+  cookiesEnabled: false
+  keepAlive: 0ms
+  maxConnections: 128
+  maxConnectionsPerRoute: 128
+  retries: 0
+  timeToLive: 1h
+  timeout: 30s
+

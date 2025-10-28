@@ -29,6 +29,5 @@ public class ServiceConfig {
     private URI url;
 
     @Valid
-    @NotNull
     private JerseyClientConfiguration httpClient;
 }

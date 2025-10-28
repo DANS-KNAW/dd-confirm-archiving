@@ -35,12 +35,13 @@ public class DdConfirmArchivingConfig extends Configuration {
 
     @NotNull
     @Valid
-    private List<DataVaultConfig> storageRoots;
+    private List<StorageRootConfig> storageRoots;
 
     @NotNull
     @Valid
     private ConfirmArchivingConfig confirmArchiving;
 
     @Valid
+    @NotNull
     private JerseyClientConfiguration defaultHttpClient;
 }

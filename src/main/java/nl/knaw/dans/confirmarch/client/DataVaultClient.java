@@ -23,6 +23,7 @@ import nl.knaw.dans.datavault.client.resources.DefaultApi;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 public class DataVaultClient {
     private final DefaultApi api;
@@ -36,9 +37,19 @@ public class DataVaultClient {
             .build();
     }
 
-    public OffsetDateTime getCreationTime(String nbn, int versionNumber) throws ApiException {
-        var version = api.objectsIdVersionsNrGet(nbn, versionNumber);
-        return version.getCreated();
+    public Optional<OffsetDateTime> getCreationTime(String nbn, int versionNumber) throws ApiException {
+        try {
+            var version = api.objectsIdVersionsNrGet(nbn, versionNumber);
+            return Optional.ofNullable(version.getCreated());
+        }
+        catch (ApiException e) {
+            if (e.getCode() == 404) {
+                return Optional.empty();
+            }
+            else {
+                throw e;
+            }
+        }
     }
 
 }

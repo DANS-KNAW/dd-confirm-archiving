@@ -20,7 +20,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class DataVaultConfig extends ServiceConfig {
+public class StorageRootConfig extends ServiceConfig {
     @NotNull
     private String ocflStorageRoot;
 }

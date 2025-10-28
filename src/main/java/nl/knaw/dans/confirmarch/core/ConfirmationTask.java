@@ -37,12 +37,19 @@ public class ConfirmationTask implements Runnable {
             var unconfirmedItems = vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun);
             log.debug("Found {} unconfirmed items", unconfirmedItems.size());
 
+            int numberConfirmed = 0;
             for (var item : unconfirmedItems) {
                 var client = storageRootClients.get(item.getStorageRoot());
                 var creationTime = client.getCreationTime(item.getDatasetNbn(), item.getOcflObjectVersionNumber());
-                vaultCatalogClient.setArchivedTimestamp(item.getDatasetNbn(), item.getOcflObjectVersionNumber(), creationTime);
+                if (creationTime.isEmpty()) {
+                    log.debug("Item datasetNbn={}, version={} not yet archived", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                    continue;
+                }
+                vaultCatalogClient.setArchivedTimestamp(item.getDatasetNbn(), item.getOcflObjectVersionNumber(), creationTime.get());
                 log.debug("Confirmed datasetNbn={}, version={}", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                numberConfirmed++;
             }
+            log.info("Confirmation task completed - {} items confirmed", numberConfirmed);
         }
         catch (Exception e) {
             log.error("Error during confirmation task", e);
