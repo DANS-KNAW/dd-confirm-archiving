@@ -1,25 +1,12 @@
-#
-# dd-confirm-archiving configuration file
-#
 server:
   applicationContextPath: /
   adminContextPath: /
   applicationConnectors:
     - type: http
-      # Replace with port number unique for this service
-      port: 20000 # TODO: Replace with unique port number
+      port: 20370
   adminConnectors:
     - type: http
-      # Replace with port number unique for this service
-      port: 20001 # TODO: Replace with unique port number
-  # Logs the requests to the Jetty http server
-  requestLog:
-    appenders:
-      - type: file
-        archive: false
-        timeZone: system
-        currentLogFilename: /var/opt/dans.knaw.nl/log/dd-confirm-archiving/request.log
-
+      port: 20371
 
 #
 # See https://www.dropwizard.io/en/latest/manual/configuration.html#logging
@@ -42,7 +29,7 @@ confirmArchiving:
   runEvery: 1min
 
 vaultCatalog:
-  url: https://dev.transfer.dans-data.nl
+  url: http://change.me
 
 storageRoots: [ ]
 #    - ocflStorageRoot: user001
