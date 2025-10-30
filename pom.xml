@@ -28,7 +28,7 @@
     <artifactId>dd-confirm-archiving</artifactId>
     <version>1.0.2-SNAPSHOT</version>
 
-    <name>Dd Confirm Archiving</name>
+    <name>DD Confirm Archiving</name>
     <url>https://github.com/DANS-KNAW/dd-confirm-archiving</url>
     <description>Registers the Data Vault archived status in the Vault Catalog</description>
     <inceptionYear>2025</inceptionYear>
