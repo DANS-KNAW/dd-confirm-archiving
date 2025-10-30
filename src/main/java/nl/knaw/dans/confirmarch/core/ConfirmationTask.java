@@ -40,6 +40,12 @@ public class ConfirmationTask implements Runnable {
             int numberConfirmed = 0;
             for (var item : unconfirmedItems) {
                 var client = storageRootClients.get(item.getStorageRoot());
+                if (client == null)        {
+                    log.error("No Data Vault client found for storage root '{}', skipping item datasetNbn={}, version={}",
+                        item.getStorageRoot(), item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                    continue;
+                }
+
                 var creationTime = client.getCreationTime(item.getDatasetNbn(), item.getOcflObjectVersionNumber());
                 if (creationTime.isEmpty()) {
                     log.debug("Item datasetNbn={}, version={} not yet archived", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
