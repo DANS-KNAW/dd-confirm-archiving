@@ -16,10 +16,12 @@
 package nl.knaw.dans.confirmarch.config;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class StorageRootConfig extends ServiceConfig {
     @NotNull
     private String ocflStorageRoot;
