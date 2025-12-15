@@ -35,7 +35,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
-        <dd-confirm-archiving-api.version>0.1.0</dd-confirm-archiving-api.version>
         <dd-vault-catalog-api.version>0.10.0</dd-vault-catalog-api.version>
         <dd-data-vault-api.version>0.8.0</dd-data-vault-api.version>
     </properties>
@@ -89,7 +88,6 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-validation-lib</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
