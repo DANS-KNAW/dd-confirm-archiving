@@ -22,7 +22,7 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.10.0</version>
+        <version>1.11.0</version>
     </parent>
 
     <artifactId>dd-confirm-archiving</artifactId>
@@ -35,9 +35,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
-        <dd-vault-catalog-api.version>0.10.0</dd-vault-catalog-api.version>
-        <dd-data-vault-api.version>0.8.0</dd-data-vault-api.version>
-        <dans-java-utils.version>2.5.1</dans-java-utils.version>
     </properties>
 
     <scm>
