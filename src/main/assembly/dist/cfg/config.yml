@@ -29,9 +29,9 @@ confirmArchiving:
   runEvery: 1min
 
 vaultCatalog:
-  url: http://change.me
+  url: http://localhost/dd-vault-catalog
   # Health check ping endpoint
-  pingUrl: http://change.me/ping
+  pingUrl: http://localhost/admin/dd-vault-catalog/ping
 
 # Storage roots to query for datasets needing archiving confirmation
 storageRoots: [ ]
