@@ -20,18 +20,23 @@ import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @AllArgsConstructor
 @Slf4j
 public class ConfirmationTask implements Runnable {
     private final VaultCatalogClient vaultCatalogClient;
     private final Map<String, DataVaultClient> storageRootClients;
+    private final Map<String, Path> storageRootProcessedDveDirs;
     private final int maxItemsPerRun;
 
     @Override
     public void run() {
-        log.info("Starting confirmation task with maxItemsPerRun={}", maxItemsPerRun);
+        log.debug("Starting confirmation task with maxItemsPerRun={}", maxItemsPerRun);
         try {
             // Get unconfirmed items from Vault Catalog
             var unconfirmedItems = vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun);
@@ -52,13 +57,62 @@ public class ConfirmationTask implements Runnable {
                     continue;
                 }
                 vaultCatalogClient.setArchivedTimestamp(item.getDatasetNbn(), item.getOcflObjectVersionNumber(), creationTime.get());
-                log.debug("Confirmed datasetNbn={}, version={}", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                log.info("Confirmed datasetNbn={}, version={}", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+
+                // After confirmation, delete processed DVE zip files for this dataset/version in the storage root
+                var processedDir = storageRootProcessedDveDirs.get(item.getStorageRoot());
+                if (processedDir == null) {
+                    log.warn("No processedDvesDir configured for storage root '{}', skipping cleanup for datasetNbn={}, version={}",
+                        item.getStorageRoot(), item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                }
+                else {
+                    cleanupProcessedDveZips(processedDir, item.getDatasetNbn(), item.getOcflObjectVersionNumber());
+                }
+
                 numberConfirmed++;
             }
-            log.info("Confirmation task completed - {} items confirmed", numberConfirmed);
+            if (numberConfirmed > 0) {
+                log.info("Confirmation task completed - {} items confirmed", numberConfirmed);
+            }
+            else {
+                log.debug("Confirmation task completed - no items confirmed");
+            }
         }
         catch (Exception e) {
             log.error("Error during confirmation task", e);
+        }
+    }
+
+    private void cleanupProcessedDveZips(Path processedDir, String nbn, int ocflVersion) {
+        // Pattern: <nbn>_v<ocfl-version>[-<index-number>].zip
+        var regex = Pattern.compile(Pattern.quote(nbn) + "_v" + ocflVersion + "(?:-\\d+)?\\.zip");
+        if (!Files.isDirectory(processedDir)) {
+            log.warn("processedDvesDir '{}' is not a directory for storage root; skipping cleanup for {} v{}", processedDir, nbn, ocflVersion);
+            return;
+        }
+        try {
+            var foundAny = false;
+            try (var stream = Files.list(processedDir)) {
+                for (var path : (Iterable<Path>) stream::iterator) {
+                    var name = path.getFileName().toString();
+                    if (regex.matcher(name).matches()) {
+                        foundAny = true;
+                        try {
+                            Files.deleteIfExists(path);
+                            log.debug("Deleted processed DVE file {}", path);
+                        }
+                        catch (IOException ioe) {
+                            log.warn("Failed to delete processed DVE file {}: {}", path, ioe.getMessage());
+                        }
+                    }
+                }
+            }
+            if (!foundAny) {
+                log.warn("No processed DVE files found in '{}' for {} v{}", processedDir, nbn, ocflVersion);
+            }
+        }
+        catch (IOException e) {
+            log.warn("Failed to list processedDvesDir '{}' for cleanup: {}", processedDir, e.getMessage());
         }
     }
 }

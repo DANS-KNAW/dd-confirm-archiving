@@ -16,6 +16,7 @@
 package nl.knaw.dans.confirmarch.client;
 
 import io.dropwizard.client.JerseyClientConfiguration;
+import lombok.Getter;
 import nl.knaw.dans.confirmarch.config.ServiceConfig;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 import nl.knaw.dans.vaultcatalog.client.api.UnconfirmedDatasetVersionExportDto;
@@ -26,6 +27,7 @@ import nl.knaw.dans.vaultcatalog.client.resources.DefaultApi;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Getter
 public class VaultCatalogClient {
     private final DefaultApi api;
 
