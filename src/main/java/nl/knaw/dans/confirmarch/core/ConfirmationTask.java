@@ -74,6 +74,9 @@ public class ConfirmationTask implements Runnable {
             if (numberConfirmed > 0) {
                 log.info("Confirmation task completed - {} items confirmed", numberConfirmed);
             }
+            else {
+                log.debug("Confirmation task completed - no items confirmed");
+            }
         }
         catch (Exception e) {
             log.error("Error during confirmation task", e);
