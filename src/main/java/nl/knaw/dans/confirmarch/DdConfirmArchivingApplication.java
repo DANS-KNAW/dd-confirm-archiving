@@ -24,6 +24,7 @@ import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 import nl.knaw.dans.confirmarch.config.DdConfirmArchivingConfig;
 import nl.knaw.dans.confirmarch.core.ConfirmationTask;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -48,10 +49,12 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
     public void run(final DdConfirmArchivingConfig configuration, final Environment environment) {
         var vaultCatalogClient = new VaultCatalogClient(configuration.getVaultCatalog(), configuration.getDefaultHttpClient());
         var storageRoots = new HashMap<String, DataVaultClient>();
+        var processedDirs = new HashMap<String, Path>();
         for (var dataVaultConfig : configuration.getStorageRoots()) {
             storageRoots.put(dataVaultConfig.getOcflStorageRoot(), new DataVaultClient(dataVaultConfig, configuration.getDefaultHttpClient()));
+            processedDirs.put(dataVaultConfig.getOcflStorageRoot(), Path.of(dataVaultConfig.getProcessedDvesDir()));
         }
-        var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, configuration.getConfirmArchiving().getMaxItemsPerRun());
+        var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, processedDirs, configuration.getConfirmArchiving().getMaxItemsPerRun());
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(confirmationTask, 0, configuration.getConfirmArchiving().getRunEvery().toMilliseconds(), TimeUnit.MILLISECONDS);

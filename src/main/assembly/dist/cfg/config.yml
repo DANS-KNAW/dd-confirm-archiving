@@ -35,6 +35,7 @@ vaultCatalog:
 storageRoots: [ ]
 #    - ocflStorageRoot: user001
 #      url: http://localhost/dd-data-vault/user001
+#      processedDvesDir: /var/opt/dans.knaw.nl/tmp/dd-transfer-to-vault/send-to-vault/outbox/processed
 
 # The default HTTP client configuration for outgoing requests, can be by vaultCatalog and storage roots
 defaultHttpClient:

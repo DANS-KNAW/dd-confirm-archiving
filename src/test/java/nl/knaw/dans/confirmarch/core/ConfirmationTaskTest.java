@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,8 +39,11 @@ public class ConfirmationTaskTest {
         storageRootClients.put("root1", dataVaultClient1);
         dataVaultClient2 = Mockito.mock(DataVaultClient.class);
         storageRootClients.put("root2", dataVaultClient2);
+        var processedDirs = new HashMap<String, Path>();
+        processedDirs.put("root1", Path.of("/tmp/root1"));
+        processedDirs.put("root2", Path.of("/tmp/root2"));
         int maxItemsPerRun = 10;
-        confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRootClients, maxItemsPerRun);
+        confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRootClients, processedDirs, maxItemsPerRun);
     }
 
 
