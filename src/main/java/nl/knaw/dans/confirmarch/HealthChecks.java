@@ -13,26 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.confirmarch.config;
+package nl.knaw.dans.confirmarch;
 
-import io.dropwizard.client.JerseyClientConfiguration;
-import lombok.Data;
+public final class HealthChecks {
+    private HealthChecks() {}
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.net.URI;
-
-@Data
-public class ServiceConfig {
-    @Valid
-    @NotNull
-    private URI url;
-
-    @Valid
-    private JerseyClientConfiguration httpClient;
-
-    // Ping endpoint, used by health checks
-    @Valid
-    @NotNull
-    private URI pingUrl;
+    public static final String VAULT_CATALOG = "vaultCatalog";
+    public static final String DATA_VAULT = "dataVault";
 }

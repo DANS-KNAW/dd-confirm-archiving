@@ -16,6 +16,7 @@
 package nl.knaw.dans.confirmarch.client;
 
 import io.dropwizard.client.JerseyClientConfiguration;
+import lombok.Getter;
 import nl.knaw.dans.confirmarch.config.ServiceConfig;
 import nl.knaw.dans.datavault.client.invoker.ApiClient;
 import nl.knaw.dans.datavault.client.invoker.ApiException;
@@ -25,6 +26,7 @@ import nl.knaw.dans.lib.util.ClientProxyBuilder;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
+@Getter
 public class DataVaultClient {
     private final DefaultApi api;
 

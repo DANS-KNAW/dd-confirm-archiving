@@ -23,6 +23,7 @@ import nl.knaw.dans.confirmarch.client.DataVaultClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 import nl.knaw.dans.confirmarch.config.DdConfirmArchivingConfig;
 import nl.knaw.dans.confirmarch.core.ConfirmationTask;
+import nl.knaw.dans.lib.util.PingHealthCheck;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -55,6 +56,27 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
             processedDirs.put(dataVaultConfig.getOcflStorageRoot(), Path.of(dataVaultConfig.getProcessedDvesDir()));
         }
         var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, processedDirs, configuration.getConfirmArchiving().getMaxItemsPerRun());
+
+        // Register Vault Catalog ping health check
+        environment.healthChecks().register(HealthChecks.VAULT_CATALOG, new PingHealthCheck(
+            HealthChecks.VAULT_CATALOG,
+            vaultCatalogClient.getApi().getApiClient().getHttpClient(),
+            configuration.getVaultCatalog().getPingUrl()));
+
+        for (var entry : storageRoots.entrySet()) {
+            var storageRoot = entry.getKey();
+            var client = entry.getValue();
+            var dataVaultPingName = HealthChecks.DATA_VAULT + "@" + storageRoot;
+            environment.healthChecks().register(dataVaultPingName, new PingHealthCheck(
+                dataVaultPingName,
+                client.getApi().getApiClient().getHttpClient(),
+                // find matching config by storage root name
+                configuration.getStorageRoots().stream()
+                    .filter(c -> storageRoot.equals(c.getOcflStorageRoot()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Missing storage root config for " + storageRoot))
+                    .getPingUrl()));
+        }
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(confirmationTask, 0, configuration.getConfirmArchiving().getRunEvery().toMilliseconds(), TimeUnit.MILLISECONDS);

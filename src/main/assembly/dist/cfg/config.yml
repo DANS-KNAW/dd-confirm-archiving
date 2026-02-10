@@ -30,11 +30,16 @@ confirmArchiving:
 
 vaultCatalog:
   url: http://change.me
+  # Health check ping endpoint
+  pingUrl: http://change.me/ping
 
 # Storage roots to query for datasets needing archiving confirmation
 storageRoots: [ ]
 #    - ocflStorageRoot: user001
 #      url: http://localhost/dd-data-vault/user001
+#      # Health check ping endpoint for this storage root
+#      pingUrl: http://localhost/dd-data-vault/user001/ping
+#      # Directory containing processed DVE zip files to clean up after confirmation
 #      processedDvesDir: /var/opt/dans.knaw.nl/tmp/dd-transfer-to-vault/send-to-vault/outbox/processed
 
 # The default HTTP client configuration for outgoing requests, can be by vaultCatalog and storage roots
