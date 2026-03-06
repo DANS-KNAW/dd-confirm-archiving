@@ -40,8 +40,8 @@ public class VaultCatalogClient {
             .build();
     }
 
-    public List<UnconfirmedDatasetVersionExportDto> getUnconfirmedItems(int maxItemsPerRun) throws ApiException {
-        return api.getUnconfirmedDatasetVersionExports(maxItemsPerRun, 0);
+    public List<UnconfirmedDatasetVersionExportDto> getUnconfirmedItems(int maxItemsPerRun, int offset) throws ApiException {
+        return api.getUnconfirmedDatasetVersionExports(maxItemsPerRun, offset);
     }
 
     public void setArchivedTimestamp(String datasetNbn, Integer ocflObjectVersionNumber, OffsetDateTime creationTime) throws ApiException {

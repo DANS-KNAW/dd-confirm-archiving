@@ -15,7 +15,9 @@
  */
 package nl.knaw.dans.confirmarch.core;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
@@ -26,7 +28,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE) // For testing
 @Slf4j
 public class ConfirmationTask implements Runnable {
     private final VaultCatalogClient vaultCatalogClient;
@@ -34,18 +37,26 @@ public class ConfirmationTask implements Runnable {
     private final Map<String, Path> storageRootProcessedDveDirs;
     private final int maxItemsPerRun;
 
+    private int alternateOffset = 0;
+    private boolean alternate = false;
+
     @Override
     public void run() {
         log.debug("Starting confirmation task with maxItemsPerRun={}", maxItemsPerRun);
         try {
             // Get unconfirmed items from Vault Catalog
-            var unconfirmedItems = vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun);
-            log.debug("Found {} unconfirmed items", unconfirmedItems.size());
+            int offset = alternate ? alternateOffset : 0;
+            var unconfirmedItems = vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun, offset);
+            log.debug("Found {} unconfirmed items at offset {} in {} mode", unconfirmedItems.size(), offset, alternate ? "alternate" : "normal");
 
+            if (alternate && unconfirmedItems.isEmpty()) {
+                log.debug("No unconfirmed items, resetting alternate offset to 0");
+                alternateOffset = 0;
+            }
             int numberConfirmed = 0;
             for (var item : unconfirmedItems) {
                 var client = storageRootClients.get(item.getStorageRoot());
-                if (client == null)        {
+                if (client == null) {
                     log.error("No Data Vault client found for storage root '{}', skipping item datasetNbn={}, version={}",
                         item.getStorageRoot(), item.getDatasetNbn(), item.getOcflObjectVersionNumber());
                     continue;
@@ -77,6 +88,18 @@ public class ConfirmationTask implements Runnable {
             else {
                 log.debug("Confirmation task completed - no items confirmed");
             }
+
+            int numberFailedToConfirm = unconfirmedItems.size() - numberConfirmed;
+            /*
+             * In alternate mode we skip items that stayed unconfirmed. In normal mode we decrease the skip offset
+             * for the alternate run by the number of confirmed items, because those items no longer need to be skipped.
+             */
+            if (alternate) {
+                alternateOffset += numberFailedToConfirm;
+            } else if (numberConfirmed > 0) {
+                alternateOffset = 0;
+            }
+            alternate = !alternate;
         }
         catch (Exception e) {
             log.error("Error during confirmation task", e);
