@@ -33,6 +33,8 @@ vaultCatalog:
   # Health check ping endpoint
   pingUrl: http://localhost/admin/dd-vault-catalog/ping
 
+# The LOB store is used to retrieve the DVE zip files that need to be confirmed as archived in the Data Vault.
+# If none of the storageRoots has a datastationName configured, this setting may be omitted.
 lobStore:
   url: http://localhost/dd-lob-store
   # Health check ping endpoint

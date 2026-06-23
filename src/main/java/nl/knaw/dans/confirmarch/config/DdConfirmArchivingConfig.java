@@ -33,7 +33,6 @@ public class DdConfirmArchivingConfig extends Configuration {
     @Valid
     private ServiceConfig vaultCatalog;
 
-    @NotNull
     @Valid
     private ServiceConfig lobStore;
 
