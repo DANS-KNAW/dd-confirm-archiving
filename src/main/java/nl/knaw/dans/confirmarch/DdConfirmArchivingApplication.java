@@ -70,8 +70,8 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
             vaultCatalogClient.getApi().getApiClient().getHttpClient(),
             configuration.getVaultCatalog().getPingUrl()));
 
-        environment.healthChecks().register("LobStore", new PingHealthCheck(
-            "LobStore",
+        environment.healthChecks().register("lobStore", new PingHealthCheck(
+            "lobStore",
             lobStoreClient.getApi().getApiClient().getHttpClient(),
             configuration.getLobStore().getPingUrl()));
 
