@@ -145,6 +145,12 @@
                                     <version>${dd-data-vault-api.version}</version>
                                     <outputDirectory>${project.build.directory}/openapi</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>nl.knaw.dans</groupId>
+                                    <artifactId>dd-lob-store-api</artifactId>
+                                    <version>0.2.1-SNAPSHOT</version>
+                                    <outputDirectory>${project.build.directory}/openapi</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -194,6 +200,24 @@
                                 <library>jersey2</library>
                                 <!-- remove this optional dependency as it was not used in the generated code anyway  -->
                                 <!-- see https://github.com/OpenAPITools/jackson-databind-nullable -->
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lob-store-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.build.directory}/openapi/dd-lob-store-api.yml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <apiPackage>nl.knaw.dans.lobstore.client.resources</apiPackage>
+                            <modelPackage>nl.knaw.dans.lobstore.client.api</modelPackage>
+                            <invokerPackage>nl.knaw.dans.lobstore.client.invoker</invokerPackage>
+                            <configOptions>
+                                <annotationLibrary>none</annotationLibrary>
+                                <library>jersey2</library>
                                 <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>

@@ -23,7 +23,11 @@ import nl.knaw.dans.datavault.client.invoker.ApiException;
 import nl.knaw.dans.datavault.client.resources.DefaultApi;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 
+import javax.ws.rs.core.GenericType;
+import java.io.File;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 @Getter
@@ -54,4 +58,27 @@ public class DataVaultClient {
         }
     }
 
+    public Optional<File> getObjectExtensionFile(String nbn, String path) throws ApiException {
+        var apiClient = api.getApiClient();
+        String localVarPath = "/ocfl/objects/{id}/extension-files/{path}"
+            .replaceAll("\\{id}", apiClient.escapeString(nbn))
+            .replaceAll("\\{path}", apiClient.escapeString(path));
+
+        String localVarAccept = apiClient.selectHeaderAccept("application/octet-stream");
+        String localVarContentType = apiClient.selectHeaderContentType();
+        GenericType<File> localVarReturnType = new GenericType<File>() {};
+
+        try {
+            var response = apiClient.invokeAPI("OcflApi.ocflObjectsIdExtensionFilesPathGet", localVarPath, "GET", new ArrayList<>(), null,
+                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
+                null, localVarReturnType, false);
+            return Optional.ofNullable(response.getData());
+        }
+        catch (ApiException e) {
+            if (e.getCode() == 404) {
+                return Optional.empty();
+            }
+            throw e;
+        }
+    }
 }
