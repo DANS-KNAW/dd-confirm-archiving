@@ -33,6 +33,11 @@ vaultCatalog:
   # Health check ping endpoint
   pingUrl: http://localhost/admin/dd-vault-catalog/ping
 
+lobStore:
+  url: http://localhost/dd-lob-store
+  # Health check ping endpoint
+  pingUrl: http://localhost/admin/dd-lob-store/ping
+
 # Storage roots to query for datasets needing archiving confirmation
 storageRoots: [ ]
 #    - ocflStorageRoot: user001
@@ -42,7 +47,7 @@ storageRoots: [ ]
 #      # Directory containing processed DVE zip files to clean up after confirmation
 #      processedDvesDir: /var/opt/dans.knaw.nl/tmp/dd-transfer-to-vault/send-to-vault/outbox/processed
 
-# The default HTTP client configuration for outgoing requests, can be by vaultCatalog and storage roots
+# The default HTTP client configuration for outgoing requests can be by vaultCatalog and storage roots
 defaultHttpClient:
   userAgent: dd-confirm-archiving
   connectionTimeout: 1min
