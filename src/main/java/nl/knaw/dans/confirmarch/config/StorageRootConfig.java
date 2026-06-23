@@ -30,4 +30,6 @@ public class StorageRootConfig extends ServiceConfig {
     // Directory containing processed DVE zip files for this storage root
     @NotBlank
     private String processedDvesDir;
+
+    private String datastationName;
 }

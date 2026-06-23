@@ -20,6 +20,7 @@ import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
+import nl.knaw.dans.confirmarch.client.LobStoreClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 import nl.knaw.dans.confirmarch.config.DdConfirmArchivingConfig;
 import nl.knaw.dans.confirmarch.core.ConfirmationTask;
@@ -49,19 +50,30 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
     @Override
     public void run(final DdConfirmArchivingConfig configuration, final Environment environment) {
         var vaultCatalogClient = new VaultCatalogClient(configuration.getVaultCatalog(), configuration.getDefaultHttpClient());
+        var lobStoreClient = new LobStoreClient(configuration.getLobStore(), configuration.getDefaultHttpClient());
         var storageRoots = new HashMap<String, DataVaultClient>();
         var processedDirs = new HashMap<String, Path>();
+        var storageRootDatastations = new HashMap<String, String>();
         for (var dataVaultConfig : configuration.getStorageRoots()) {
             storageRoots.put(dataVaultConfig.getOcflStorageRoot(), new DataVaultClient(dataVaultConfig, configuration.getDefaultHttpClient()));
             processedDirs.put(dataVaultConfig.getOcflStorageRoot(), Path.of(dataVaultConfig.getProcessedDvesDir()));
+            if (dataVaultConfig.getDatastationName() != null) {
+                storageRootDatastations.put(dataVaultConfig.getOcflStorageRoot(), dataVaultConfig.getDatastationName());
+            }
         }
-        var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, processedDirs, configuration.getConfirmArchiving().getMaxItemsPerRun());
+        var confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRoots, processedDirs, storageRootDatastations, lobStoreClient,
+            environment.getObjectMapper(), configuration.getConfirmArchiving().getMaxItemsPerRun());
 
         // Register Vault Catalog ping health check
         environment.healthChecks().register(HealthChecks.VAULT_CATALOG, new PingHealthCheck(
             HealthChecks.VAULT_CATALOG,
             vaultCatalogClient.getApi().getApiClient().getHttpClient(),
             configuration.getVaultCatalog().getPingUrl()));
+
+        environment.healthChecks().register("lobStore", new PingHealthCheck(
+            "lobStore",
+            lobStoreClient.getApi().getApiClient().getHttpClient(),
+            configuration.getLobStore().getPingUrl()));
 
         for (var entry : storageRoots.entrySet()) {
             var storageRoot = entry.getKey();

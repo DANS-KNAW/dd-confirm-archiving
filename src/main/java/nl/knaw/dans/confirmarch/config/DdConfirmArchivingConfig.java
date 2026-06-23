@@ -33,6 +33,9 @@ public class DdConfirmArchivingConfig extends Configuration {
     @Valid
     private ServiceConfig vaultCatalog;
 
+    @Valid
+    private ServiceConfig lobStore;
+
     @NotNull
     @Valid
     private List<StorageRootConfig> storageRoots;

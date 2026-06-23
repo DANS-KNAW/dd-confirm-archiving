@@ -20,11 +20,14 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
+import nl.knaw.dans.confirmarch.client.LobStoreClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -35,10 +38,25 @@ public class ConfirmationTask implements Runnable {
     private final VaultCatalogClient vaultCatalogClient;
     private final Map<String, DataVaultClient> storageRootClients;
     private final Map<String, Path> storageRootProcessedDveDirs;
+    private final Map<String, String> storageRootDatastations;
+    private final LobStoreClient lobStoreClient;
+    private final ObjectMapper objectMapper;
     private final int maxItemsPerRun;
 
     private int alternateOffset = 0;
     private boolean alternate = false;
+
+    // Additional constructor for testing old tests
+    ConfirmationTask(VaultCatalogClient vaultCatalogClient, Map<String, DataVaultClient> storageRootClients,
+        Map<String, Path> storageRootProcessedDveDirs, int maxItemsPerRun) {
+        this(vaultCatalogClient, storageRootClients, storageRootProcessedDveDirs, Map.of(), null, new ObjectMapper(), maxItemsPerRun, 0, false);
+    }
+
+    // Additional constructor for testing old tests
+    ConfirmationTask(VaultCatalogClient vaultCatalogClient, Map<String, DataVaultClient> storageRootClients,
+        Map<String, Path> storageRootProcessedDveDirs, int maxItemsPerRun, int alternateOffset, boolean alternate) {
+        this(vaultCatalogClient, storageRootClients, storageRootProcessedDveDirs, Map.of(), null, new ObjectMapper(), maxItemsPerRun, alternateOffset, alternate);
+    }
 
     @Override
     public void run() {
@@ -67,6 +85,14 @@ public class ConfirmationTask implements Runnable {
                     log.debug("Item datasetNbn={}, version={} not yet archived", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
                     continue;
                 }
+
+                var datastation = storageRootDatastations.get(item.getStorageRoot());
+                if (datastation != null) {
+                    if (!verifyLobs(client, datastation, item.getDatasetNbn(), item.getOcflObjectVersionNumber())) {
+                        continue;
+                    }
+                }
+
                 vaultCatalogClient.setArchivedTimestamp(item.getDatasetNbn(), item.getOcflObjectVersionNumber(), creationTime.get());
                 log.info("Confirmed datasetNbn={}, version={}", item.getDatasetNbn(), item.getOcflObjectVersionNumber());
 
@@ -103,6 +129,52 @@ public class ConfirmationTask implements Runnable {
         }
         catch (Exception e) {
             log.error("Error during confirmation task", e);
+        }
+    }
+
+    private boolean verifyLobs(DataVaultClient client, String datastation, String nbn, int version) {
+        try {
+            var propertiesFile = client.getObjectExtensionFile(nbn, "object-version-properties/object_version_properties.json");
+            if (propertiesFile.isEmpty()) {
+                log.error("Properties file missing for datasetNbn={}, skipping confirmation", nbn);
+                return false;
+            }
+
+            var properties = objectMapper.readValue(propertiesFile.get(), Map.class);
+            var versionKey = "v" + version;
+            @SuppressWarnings("unchecked")
+            var versionProperties = (Map<String, Object>) properties.get(versionKey);
+
+            if (versionProperties == null) {
+                log.error("Properties for version {} missing for datasetNbn={}, skipping confirmation", versionKey, nbn);
+                return false;
+            }
+
+            @SuppressWarnings("unchecked")
+            var externalLargeObjects = (Map<String, Object>) versionProperties.get("external-large-objects");
+            if (externalLargeObjects != null) {
+                var checksumAlgorithm = (String) externalLargeObjects.get("checksum-algorithm");
+                if (!"sha-1".equalsIgnoreCase(checksumAlgorithm)) {
+                    log.error("Unsupported checksum algorithm '{}' for datasetNbn={}, version={}, skipping confirmation", checksumAlgorithm, nbn, version);
+                    return false;
+                }
+
+                @SuppressWarnings("unchecked")
+                var lobs = (List<String>) externalLargeObjects.get("lobs");
+                if (lobs != null) {
+                    for (var hash : lobs) {
+                        if (!lobStoreClient.isLobPresent(datastation, hash)) {
+                            log.warn("LOB with hash {} not found in store {} for datasetNbn={}, version={}, skipping confirmation", hash, datastation, nbn, version);
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        catch (Exception e) {
+            log.error("Error verifying LOBs for datasetNbn={}, version={}", nbn, version, e);
+            return false;
         }
     }
 

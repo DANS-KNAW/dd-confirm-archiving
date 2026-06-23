@@ -16,12 +16,16 @@
 package nl.knaw.dans.confirmarch.core;
 
 import nl.knaw.dans.confirmarch.client.DataVaultClient;
+import nl.knaw.dans.confirmarch.client.LobStoreClient;
 import nl.knaw.dans.confirmarch.client.VaultCatalogClient;
 import nl.knaw.dans.vaultcatalog.client.api.UnconfirmedDatasetVersionExportDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -45,13 +49,16 @@ public class ConfirmationTaskTest {
     private VaultCatalogClient vaultCatalogClient;
     private DataVaultClient dataVaultClient1;
     private DataVaultClient dataVaultClient2;
+    private LobStoreClient lobStoreClient;
     private Map<String, DataVaultClient> storageRootClients;
     private Map<String, Path> processedDirs;
+    private Map<String, String> datastations;
     private final int maxItemsPerRun = 10;
 
     @BeforeEach
     public void setUp() {
         vaultCatalogClient = mock(VaultCatalogClient.class);
+        lobStoreClient = mock(LobStoreClient.class);
         storageRootClients = new HashMap<>();
         dataVaultClient1 = mock(DataVaultClient.class);
         storageRootClients.put("root1", dataVaultClient1);
@@ -60,7 +67,72 @@ public class ConfirmationTaskTest {
         processedDirs = new HashMap<>();
         processedDirs.put("root1", Path.of("/tmp/root1"));
         processedDirs.put("root2", Path.of("/tmp/root2"));
-        confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRootClients, processedDirs, maxItemsPerRun);
+        datastations = new HashMap<>();
+        confirmationTask = new ConfirmationTask(vaultCatalogClient, storageRootClients, processedDirs, datastations, lobStoreClient, new ObjectMapper(), maxItemsPerRun, 0, false);
+    }
+
+    @Test
+    public void should_confirm_if_datastation_is_not_configured_even_if_lobs_present() throws Exception {
+        // Given
+        var item = createItem("nbn1", 1, "root1");
+        when(vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun, 0)).thenReturn(List.of(item));
+        when(dataVaultClient1.getCreationTime("nbn1", 1)).thenReturn(Optional.of(OffsetDateTime.now()));
+        // datastations map is empty, so root1 has no datastation name
+
+        // When
+        confirmationTask.run();
+
+        // Then
+        verify(vaultCatalogClient).setArchivedTimestamp(eq("nbn1"), eq(1), any());
+        verify(dataVaultClient1, never()).getObjectExtensionFile(anyString(), anyString());
+    }
+
+    @Test
+    public void should_not_confirm_if_datastation_is_configured_and_lobs_missing() throws Exception {
+        // Given
+        datastations.put("root1", "ds1");
+        var item = createItem("nbn1", 1, "root1");
+        when(vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun, 0)).thenReturn(List.of(item));
+        when(dataVaultClient1.getCreationTime("nbn1", 1)).thenReturn(Optional.of(OffsetDateTime.now()));
+
+        var propertiesJson = "{\"v1\": {\"external-large-objects\": {\"checksum-algorithm\": \"sha-1\", \"lobs\": [\"hash1\"]}}}";
+        var tempFile = File.createTempFile("properties", ".json");
+        Files.writeString(tempFile.toPath(), propertiesJson);
+        tempFile.deleteOnExit();
+
+        when(dataVaultClient1.getObjectExtensionFile("nbn1", "object-version-properties/object_version_properties.json"))
+            .thenReturn(Optional.of(tempFile));
+        when(lobStoreClient.isLobPresent("ds1", "hash1")).thenReturn(false);
+
+        // When
+        confirmationTask.run();
+
+        // Then
+        verify(vaultCatalogClient, never()).setArchivedTimestamp(anyString(), anyInt(), any());
+    }
+
+    @Test
+    public void should_confirm_if_datastation_is_configured_and_lobs_present() throws Exception {
+        // Given
+        datastations.put("root1", "ds1");
+        var item = createItem("nbn1", 1, "root1");
+        when(vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun, 0)).thenReturn(List.of(item));
+        when(dataVaultClient1.getCreationTime("nbn1", 1)).thenReturn(Optional.of(OffsetDateTime.now()));
+
+        var propertiesJson = "{\"v1\": {\"external-large-objects\": {\"checksum-algorithm\": \"sha-1\", \"lobs\": [\"hash1\"]}}}";
+        var tempFile = File.createTempFile("properties", ".json");
+        Files.writeString(tempFile.toPath(), propertiesJson);
+        tempFile.deleteOnExit();
+
+        when(dataVaultClient1.getObjectExtensionFile("nbn1", "object-version-properties/object_version_properties.json"))
+            .thenReturn(Optional.of(tempFile));
+        when(lobStoreClient.isLobPresent("ds1", "hash1")).thenReturn(true);
+
+        // When
+        confirmationTask.run();
+
+        // Then
+        verify(vaultCatalogClient).setArchivedTimestamp(eq("nbn1"), eq(1), any());
     }
 
 

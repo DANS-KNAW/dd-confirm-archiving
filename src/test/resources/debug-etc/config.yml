@@ -28,10 +28,17 @@ confirmArchiving:
 
 vaultCatalog:
   url: http://dev.transfer.dans-data.nl:20305/
+  pingUrl: http://dev.transfer.dans-data.nl:20305/ping
+
+lobStore:
+  url: http://dev.transfer.dans-data.nl:20420/
+  pingUrl: http://dev.transfer.dans-data.nl:20420/ping
 
 storageRoots:
   - ocflStorageRoot: user001
     url: http://dev.transfer.dans-data.nl/dd-data-vault/user001
+    pingUrl: http://dev.transfer.dans-data.nl/dd-data-vault/user001/ping
+    processedDvesDir: /tmp/processed
 
 defaultHttpClient:
   userAgent: dd-confirm-archiving
