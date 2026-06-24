@@ -37,7 +37,7 @@
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
         <dd-vault-catalog-api.version>1.0.0</dd-vault-catalog-api.version>
         <dd-lob-store-api.version>1.0.0</dd-lob-store-api.version>
-        <dd-data-vault-api.version>1.3.0</dd-data-vault-api.version>
+        <dd-data-vault-api.version>1.3.1-SNAPSHOT</dd-data-vault-api.version>
         <dans-java-utils.version>4.0.0-SNAPSHOT</dans-java-utils.version>
     </properties>
 

@@ -65,7 +65,7 @@ public class DataVaultClient {
 
     public Optional<File> getObjectExtensionFile(String nbn, String path) throws ApiException {
         try {
-            return Optional.of(ocflApi.ocflObjectsIdExtensionFilesPathGet(nbn, path));
+            return Optional.of(ocflApi.ocflObjectsIdExtensionFileGet(nbn, path));
         }
         catch (ApiException e) {
             if (e.getCode() == 404) {
