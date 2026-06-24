@@ -26,7 +26,7 @@
     </parent>
 
     <artifactId>dd-confirm-archiving</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.1.0</version>
 
     <name>DD Confirm Archiving</name>
     <url>https://github.com/DANS-KNAW/dd-confirm-archiving</url>
@@ -43,7 +43,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://github.com/DANS-KNAW/dd-confirm-archiving</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v2.1.0</tag>
     </scm>
 
     <dependencies>
