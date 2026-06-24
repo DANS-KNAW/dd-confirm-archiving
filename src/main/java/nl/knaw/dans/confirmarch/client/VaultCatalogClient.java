@@ -33,8 +33,8 @@ public class VaultCatalogClient {
 
     public VaultCatalogClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
         api = new ClientProxyBuilder<ApiClient, DefaultApi>()
-            .apiClient(new ApiClient())
-            .defaultApiCtor(DefaultApi::new)
+            .apiClientCtor(ApiClient::new)
+            .proxyCtor(DefaultApi::new)
             .basePath(serviceConfig.getUrl())
             .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
             .build();

@@ -119,7 +119,7 @@ public class ConfirmationTaskTest {
         when(vaultCatalogClient.getUnconfirmedItems(maxItemsPerRun, 0)).thenReturn(List.of(item));
         when(dataVaultClient1.getCreationTime("nbn1", 1)).thenReturn(Optional.of(OffsetDateTime.now()));
 
-        var propertiesJson = "{\"v1\": {\"external-large-objects\": {\"checksum-algorithm\": \"sha-1\", \"lobs\": [\"hash1\"]}}}";
+        var propertiesJson = "{\"v1\": {\"external-large-objects\": {\"checksum-algorithm\": \"sha1\", \"lobs\": [\"hash1\"]}}}";
         var tempFile = File.createTempFile("properties", ".json");
         Files.writeString(tempFile.toPath(), propertiesJson);
         tempFile.deleteOnExit();

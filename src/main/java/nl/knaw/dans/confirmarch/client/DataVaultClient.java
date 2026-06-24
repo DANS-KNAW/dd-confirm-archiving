@@ -21,31 +21,36 @@ import nl.knaw.dans.confirmarch.config.ServiceConfig;
 import nl.knaw.dans.datavault.client.invoker.ApiClient;
 import nl.knaw.dans.datavault.client.invoker.ApiException;
 import nl.knaw.dans.datavault.client.resources.DefaultApi;
+import nl.knaw.dans.datavault.client.resources.OcflApi;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 
-import javax.ws.rs.core.GenericType;
 import java.io.File;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 @Getter
 public class DataVaultClient {
-    private final DefaultApi api;
+    private final DefaultApi defaultApi;
+    private final OcflApi ocflApi;
 
     public DataVaultClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
-        api = new ClientProxyBuilder<ApiClient, DefaultApi>()
+        defaultApi = new ClientProxyBuilder<ApiClient, DefaultApi>()
             .basePath(serviceConfig.getUrl())
-            .apiClient(new ApiClient())
-            .defaultApiCtor(DefaultApi::new)
+            .apiClientCtor(ApiClient::new)
+            .proxyCtor(DefaultApi::new)
+            .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
+            .build();
+        ocflApi = new ClientProxyBuilder<ApiClient, OcflApi>()
+            .basePath(serviceConfig.getUrl())
+            .apiClientCtor(ApiClient::new)
+            .proxyCtor(OcflApi::new)
             .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
             .build();
     }
 
     public Optional<OffsetDateTime> getCreationTime(String nbn, int versionNumber) throws ApiException {
         try {
-            var version = api.objectsIdVersionsNrGet(nbn, versionNumber);
+            var version = defaultApi.objectsIdVersionsNrGet(nbn, versionNumber);
             return Optional.ofNullable(version.getCreated());
         }
         catch (ApiException e) {
@@ -59,20 +64,8 @@ public class DataVaultClient {
     }
 
     public Optional<File> getObjectExtensionFile(String nbn, String path) throws ApiException {
-        var apiClient = api.getApiClient();
-        String localVarPath = "/ocfl/objects/{id}/extension-files/{path}"
-            .replaceAll("\\{id}", apiClient.escapeString(nbn))
-            .replaceAll("\\{path}", apiClient.escapeString(path));
-
-        String localVarAccept = apiClient.selectHeaderAccept("application/octet-stream");
-        String localVarContentType = apiClient.selectHeaderContentType();
-        GenericType<File> localVarReturnType = new GenericType<File>() {};
-
         try {
-            var response = apiClient.invokeAPI("OcflApi.ocflObjectsIdExtensionFilesPathGet", localVarPath, "GET", new ArrayList<>(), null,
-                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
-                null, localVarReturnType, false);
-            return Optional.ofNullable(response.getData());
+            return Optional.of(ocflApi.ocflObjectsIdExtensionFilesPathGet(nbn, path));
         }
         catch (ApiException e) {
             if (e.getCode() == 404) {

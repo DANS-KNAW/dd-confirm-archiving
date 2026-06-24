@@ -29,8 +29,8 @@ public class LobStoreClient {
 
     public LobStoreClient(ServiceConfig serviceConfig, JerseyClientConfiguration defaultHttpClient) {
         api = new ClientProxyBuilder<ApiClient, DefaultApi>()
-            .apiClient(new ApiClient())
-            .defaultApiCtor(DefaultApi::new)
+            .proxyCtor(DefaultApi::new)
+            .apiClientCtor(ApiClient::new)
             .basePath(serviceConfig.getUrl())
             .httpClient(serviceConfig.getHttpClient() == null ? defaultHttpClient : serviceConfig.getHttpClient())
             .build();

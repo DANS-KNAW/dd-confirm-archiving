@@ -154,7 +154,7 @@ public class ConfirmationTask implements Runnable {
             var externalLargeObjects = (Map<String, Object>) versionProperties.get("external-large-objects");
             if (externalLargeObjects != null) {
                 var checksumAlgorithm = (String) externalLargeObjects.get("checksum-algorithm");
-                if (!"sha-1".equalsIgnoreCase(checksumAlgorithm)) {
+                if (!"sha1".equalsIgnoreCase(checksumAlgorithm)) {
                     log.error("Unsupported checksum algorithm '{}' for datasetNbn={}, version={}, skipping confirmation", checksumAlgorithm, nbn, version);
                     return false;
                 }

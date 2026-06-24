@@ -81,7 +81,7 @@ public class DdConfirmArchivingApplication extends Application<DdConfirmArchivin
             var dataVaultPingName = HealthChecks.DATA_VAULT + "@" + storageRoot;
             environment.healthChecks().register(dataVaultPingName, new PingHealthCheck(
                 dataVaultPingName,
-                client.getApi().getApiClient().getHttpClient(),
+                client.getDefaultApi().getApiClient().getHttpClient(),
                 // find matching config by storage root name
                 configuration.getStorageRoots().stream()
                     .filter(c -> storageRoot.equals(c.getOcflStorageRoot()))
