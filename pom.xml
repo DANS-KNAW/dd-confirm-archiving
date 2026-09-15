@@ -30,7 +30,7 @@
 
     <name>DD Confirm Archiving</name>
     <description>Registers the Data Vault archived status in the Vault Catalog</description>
-    <url>https://github.com/DANS-KNAW/dd-confirm-archiving</url>
+    <url>https://dans-knaw.github.io/dd-confirm-archiving</url>
     <inceptionYear>2025</inceptionYear>
 
     <scm>
