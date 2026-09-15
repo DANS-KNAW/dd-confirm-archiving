@@ -22,7 +22,7 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
     </parent>
 
     <artifactId>dd-confirm-archiving</artifactId>
@@ -40,10 +40,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.confirmarch.DdConfirmArchivingApplication</main-class>
-        <!--        <dd-vault-catalog-api.version>1.0.0</dd-vault-catalog-api.version>-->
-        <!--        <dd-lob-store-api.version>1.0.0</dd-lob-store-api.version>-->
-        <!--        <dd-data-vault-api.version>1.4.0</dd-data-vault-api.version>-->
-        <!--        <dans-java-utils.version>4.0.0</dans-java-utils.version>-->
     </properties>
 
     <dependencies>
@@ -60,8 +56,7 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <!-- TODO upgrade to nl.datastations version when available -->
-            <groupId>nl.knaw.dans</groupId>
+            <groupId>nl.datastations</groupId>
             <artifactId>dans-java-utils</artifactId>
         </dependency>
         <dependency>
