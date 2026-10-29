@@ -122,7 +122,8 @@ public class ConfirmationTask implements Runnable {
              */
             if (alternate) {
                 alternateOffset += numberFailedToConfirm;
-            } else if (numberConfirmed > 0) {
+            }
+            else if (numberConfirmed > 0) {
                 alternateOffset = 0;
             }
             alternate = !alternate;
@@ -140,7 +141,20 @@ public class ConfirmationTask implements Runnable {
                 return false;
             }
 
-            var properties = objectMapper.readValue(propertiesFile.get(), Map.class);
+            var file = propertiesFile.get();
+            Map<?, ?> properties;
+            try {
+                properties = objectMapper.readValue(file, Map.class);
+            }
+            finally {
+                try {
+                    Files.deleteIfExists(file.toPath());
+                }
+                catch (IOException e) {
+                    log.warn("Failed to delete temporary file {}", file, e);
+                }
+            }
+
             var versionKey = "v" + version;
             @SuppressWarnings("unchecked")
             var versionProperties = (Map<String, Object>) properties.get(versionKey);

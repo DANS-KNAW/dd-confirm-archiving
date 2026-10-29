@@ -109,6 +109,7 @@ public class ConfirmationTaskTest {
 
         // Then
         verify(vaultCatalogClient, never()).setArchivedTimestamp(anyString(), anyInt(), any());
+        assertThat(tempFile).doesNotExist();
     }
 
     @Test
@@ -133,8 +134,8 @@ public class ConfirmationTaskTest {
 
         // Then
         verify(vaultCatalogClient).setArchivedTimestamp(eq("nbn1"), eq(1), any());
+        assertThat(tempFile).doesNotExist();
     }
-
 
     @Test
     public void should_do_nothing_when_no_unconfirmed_items() throws Exception {
@@ -176,7 +177,6 @@ public class ConfirmationTaskTest {
         // alternateOffset was 5, 1 confirmed, so it should be reset to 0
         assertThat(getAlternateOffset(confirmationTask)).isEqualTo(0);
     }
-
 
     @Test
     public void alternate_mode_should_use_alternateOffset_and_increment_it() throws Exception {
